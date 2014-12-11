@@ -42,14 +42,8 @@
        <ul class="my-socials">
   
   <li>
-  	<a href="https://github.com/henryhuang" class="github" target="_blank">
+  	<a href="https://github.com/jacob-carrier" class="github" target="_blank">
   		<i class="fa fa-github"></i>
-  	</a>
-  </li>
-  
-  <li>
-  	<a href="http://weibo.com/626242034" class="weibo" target="_blank">
-  		<i class="fa fa-weibo"></i>
   	</a>
   </li>
   
@@ -78,12 +72,8 @@
       <a href="/">Jacob Lemelin-Carrier - Developer</a>
       <span id="title-nav-socials">
         
-          <a href="https://github.com/henryhuang" class="github" target="_blank">
+          <a href="https://github.com/jacob-carrier" class="github" target="_blank">
             <i class="fa fa-github"></i>
-          </a>
-        
-          <a href="http://weibo.com/626242034" class="weibo" target="_blank">
-            <i class="fa fa-weibo"></i>
           </a>
         
        
@@ -120,6 +110,78 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-SFML-RPGEngine-Series-Part-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/09/SFML-RPGEngine-Series-Part-1/" class="article-date">
+  <time datetime="2014-12-09T15:24:49.000Z" itemprop="datePublished">Dec 9 2014</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/09/SFML-RPGEngine-Series-Part-1/">SFML-RPGEngine-Series-Part-1</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Basic_Engine_Framework">Basic Engine Framework</h2>
+<h3 id="Disclaimer">Disclaimer</h3>
+<p>In this tutorial series, I will be showing you my way of developing a simple engine for an RPG Game. I am not a professional developer, nor do I have extensive knowledge on this, but working on this is a learning process, which I want to share with newer developers to to allow them to get some insight on how things can be done.</p>
+<p>I also will be developing this on Windows with Visual Studio 2012, using SFML 2.1 for rendering and window management and I will not be going over on how to configure your IDE and setup SFML, you can go over to their <a href="http://sfml-dev.org/tutorials/2.1/" target="_blank" rel="external">Getting Started Tutorials</a> for great guides on how to do so.</p>
+<h3 id="Getting_Started">Getting Started</h3>
+<p>We will start this tutorial series with the core of what an engine needs, and that is a gameloop with basic message processing. We will start with a basic framework to get started. Here is what the basic header and source file looks like.</p>
+<h6 id="Engine-h">Engine.h</h6>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#ifndef ENGINE_H</span></div><div class="line"><span class="preprocessor">#<span class="keyword">define</span> ENGINE_H</span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;SFML\Graphics.hpp&gt;</span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;SFML\System\Clock.hpp&gt;</span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;SFML\System\Time.hpp&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">namespace</span> RPGEngine</div><div class="line">{</div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> Engine{</div><div class="line">        <span class="keyword">public</span>:</div><div class="line">            Engine(<span class="keyword">int</span> width, <span class="keyword">int</span> height, <span class="keyword">const</span> std::<span class="built_in">string</span>& title);</div><div class="line">            ~Engine();</div><div class="line">            <span class="keyword">void</span> Run();</div><div class="line">        <span class="keyword">private</span>:</div><div class="line">            <span class="keyword">void</span> Update();</div><div class="line">            <span class="keyword">void</span> Render();</div><div class="line"></div><div class="line">            sf::RenderWindow window;</div><div class="line">            sf::Event event;</div><div class="line">            <span class="keyword">bool</span> running;</div><div class="line">    };</div><div class="line">}</div><div class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></div></pre></td></tr></table></figure>
+
+<h6 id="Engine-cpp">Engine.cpp</h6>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">include</span> "Engine.h"</span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;string&gt;</span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;iostream&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">namespace</span> RPGEngine{</div><div class="line">    Engine::Engine(<span class="keyword">int</span> width, <span class="keyword">int</span> height, <span class="keyword">const</span> std::<span class="built_in">string</span>& title){</div><div class="line">        window.create(sf::VideoMode(width, height), title.c_str());</div><div class="line">    }</div><div class="line"></div><div class="line">    Engine::~Engine(){</div><div class="line">        </div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">void</span> Engine::Run(){</div><div class="line">        <span class="keyword">while</span>(window.isOpen()){</div><div class="line">            <span class="keyword">this</span>-&gt;Update();</div><div class="line">            <span class="keyword">this</span>-&gt;Render();</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    sf::RenderWindow& Engine::Window(){</div><div class="line">        <span class="keyword">return</span> window;</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">void</span> Engine::Update(){</div><div class="line"></div><div class="line">        <span class="keyword">while</span>(window.pollEvent(event)){</div><div class="line">            <span class="keyword">if</span> (event.type == sf::Event::Closed){</div><div class="line">                window.close();</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keyword">void</span> Engine::Render(){</div><div class="line">        window.clear();</div><div class="line">        <span class="comment">//Do your rendering here</span></div><div class="line">        window.display();</div><div class="line">    }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>As you can see, nothing too exciting is going on, but now we have a basic framework to run the engine, and seperate our processes for readability and functionality.</p>
+<p>First we have our constructor, which takes 3 parameters for the width, height and title of our window. <code>SFML::VideoMode</code> contains more settings that you can set, but just to get ourselves up and running we will settle with this.</p>
+<p>You may have noticed that we have a <code>Run()</code> function that has our update and rendering functions. We could have placed our game loop entirely in it, but this way it is cleaner and we can more easily seperate the rendering from the game logic. It will continuously loop until the window receives a close event, and update our game.</p>
+<h6 id="Engine::Update">Engine::Update</h6>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> Engine::Update(){</div><div class="line">    <span class="keyword">while</span>(window.pollEvent(event)){</div><div class="line">        <span class="keyword">if</span> (event.type == sf::Event::Closed){</div><div class="line">            window.close();</div><div class="line">        }</div><div class="line">        <span class="comment">//Update input manager and other window events</span></div><div class="line">    }</div><div class="line">    <span class="comment">// Update all other systems</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>By looking at our update function, you can see where the logic will go for the rest of the engine. Where I have placed the comments is where the input logic as well as other systems such as entity manager, state manager, etc will be updated. As the engine updates, it polls for window events, and based on the event we can execute some actions. In this case if it is a close event, the windows closes, which later in our run function will not execute our update and rendering which ultimately will stop the engine from running.</p>
+<h6 id="Engine::Render()">Engine::Render()</h6>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">void</span> Engine::Render(){</div><div class="line">    window.clear();</div><div class="line">    <span class="comment">//Do your rendering here</span></div><div class="line">    window.display();</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>The render function will take care of the rendering of all our entities and screens. Without going into the specifics of SFML (you can easily replace SFML with any other graphics library), you have to clear the back buffer <code>clear()</code>, and flip the backbuffer to the front <code>display()</code>, and the rendering goes between those two lines. If you want to understand the logic behind this, simply look into double buffering. In the future, we will use our window object to pass to the other classes that require it to draw things the screen.</p>
+<p>Then, we can simply create our engine object in our main entry point, run the engine, and it will loop until the window receives a close event.</p>
+<h6 id="main-cpp">main.cpp</h6>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#<span class="keyword">include</span> &lt;SFML\Graphics.hpp&gt;</span></div><div class="line"><span class="preprocessor">#<span class="keyword">include</span> "Engine.h"</span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> RPGEngine;</div><div class="line"></div><div class="line"><span class="keyword">int</span> main()</div><div class="line">{</div><div class="line">    Engine* engine = <span class="keyword">new</span> Engine(<span class="number">800</span>, <span class="number">600</span>, <span class="string">"2D RPG Engine - Window"</span>);</div><div class="line">    engine-&gt;Run();</div><div class="line"></div><div class="line">    <span class="keyword">delete</span> engine;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>Don’t forget to clean up your pointers when you are done!</p>
+<h3 id="Conclusion">Conclusion</h3>
+<p>This first part is fairly barebones and short, but it will give you a general idea on how to encapsulate and seperate your data. In the next part of this series, we will create a basic tile class, as well as show how to open a Tiled Map Editor Map for basic map rendering.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2014/12/09/SFML-RPGEngine-Series-Part-1/" data-id="1lu1lrhzrbo17jgv" class="article-share-link">Share</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/engine-sfml-game-development/">engine, sfml, game development</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-Introductory-Post" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
